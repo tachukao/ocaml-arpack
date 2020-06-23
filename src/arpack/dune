@@ -1,0 +1,4 @@
+(library
+ (name arpack)
+ (public_name arpack)
+ (libraries ctypes owl arpack.core))

@@ -1,0 +1,31 @@
+(library
+ (name arpack_core)
+ (public_name arpack.core)
+ (libraries ctypes owl)
+ (foreign_stubs
+  (language c)
+  (names arpack_stubs)
+  (flags
+   (:include c_flags.sexp)))
+ (c_library_flags
+  (:include c_library_flags.sexp)))
+
+(rule
+ (targets c_flags.sexp c_library_flags.sexp)
+ (deps
+  (:discover ../config/discover.exe))
+ (action
+  (run %{discover})))
+
+(rule
+ (targets arpack_bindings.ml)
+ (deps ../bindings/arpack_bindings.ml)
+ (action
+  (copy ../bindings/arpack_bindings.ml arpack_bindings.ml)))
+
+(rule
+ (targets arpack_stubs.c arpack_generated.ml)
+ (deps
+  (:arpack_gen ../bindings/arpack_gen.exe))
+ (action
+  (run %{arpack_gen})))
