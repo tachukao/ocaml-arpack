@@ -7,7 +7,7 @@ module type Real = sig
     :  ?tol:float
     -> ?max_iter:int
     -> ?ncv:int
-    -> which:[< `BE | `LA | `LM | `SA | `SM]
+    -> which:[< `BE | `LA | `LM | `SA | `SM ]
     -> n:int
     -> nev:int
     -> ((float, elt, c_layout) Array1.t -> (float, elt, c_layout) Array1.t -> unit)
@@ -17,7 +17,7 @@ module type Real = sig
     :  ?tol:float
     -> ?max_iter:int
     -> ?ncv:int
-    -> which:[< `BE | `LA | `LM | `SA | `SM]
+    -> which:[< `BE | `LA | `LM | `SA | `SM ]
     -> n:int
     -> nev:int
     -> ((float, elt, c_layout) Array1.t -> (float, elt, c_layout) Array1.t -> unit)
