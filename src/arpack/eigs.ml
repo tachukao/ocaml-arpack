@@ -114,7 +114,7 @@ let rsolve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ kind =
       ~info;
     if Ctypes.(!@info) < 0
     then failwith (Printf.sprintf "*neupd_c error %i" Ctypes.(!@info));
-    if evecs then d, Some z else d, None)
+    if evecs then Some z, d else None, d)
 
 
 let csolve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ real_elt_typ kind =
@@ -213,4 +213,4 @@ let csolve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ real_elt_
       ~info;
     if Ctypes.(!@info) < 0
     then failwith (Printf.sprintf "*neupd_c error %i" Ctypes.(!@info));
-    if evecs then d, Some z else d, None)
+    if evecs then Some z, d else None, d)

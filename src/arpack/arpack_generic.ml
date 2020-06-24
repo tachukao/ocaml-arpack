@@ -15,15 +15,15 @@ let eigsh
   =
   match kind with
   | Float32 ->
-    let d, z =
+    let evecs, evals =
       Eigsh.solve ~evecs:true ~tol ?max_iter ?ncv ~which ~n ~nev av float Float32
     in
-    d, Option.get z
+    Option.get evecs, evals
   | Float64 ->
-    let d, z =
+    let evecs, evals =
       Eigsh.solve ~evecs:true ~tol ?max_iter ?ncv ~which ~n ~nev av double Float64
     in
-    d, Option.get z
+    Option.get evecs, evals
 
 
 let eigshvals
@@ -40,15 +40,9 @@ let eigshvals
   =
   match kind with
   | Float32 ->
-    let d, _ =
-      Eigsh.solve ~evecs:false ~tol ?max_iter ?ncv ~which ~n ~nev av float Float32
-    in
-    d
+    Eigsh.solve ~evecs:false ~tol ?max_iter ?ncv ~which ~n ~nev av float Float32 |> snd
   | Float64 ->
-    let d, _ =
-      Eigsh.solve ~evecs:false ~tol ?max_iter ?ncv ~which ~n ~nev av double Float64
-    in
-    d
+    Eigsh.solve ~evecs:false ~tol ?max_iter ?ncv ~which ~n ~nev av double Float64 |> snd
 
 
 let eigs
@@ -65,17 +59,17 @@ let eigs
   =
   match kind with
   | Float32   ->
-    let d, z =
+    let evecs, evals =
       Eigs.rsolve ~evecs:true ~tol ?max_iter ?ncv ~which ~n ~nev av float Float32
     in
-    d, Option.get z
+    Option.get evecs, evals
   | Float64   ->
-    let d, z =
+    let evecs, evals =
       Eigs.rsolve ~evecs:true ~tol ?max_iter ?ncv ~which ~n ~nev av double Float64
     in
-    d, Option.get z
+    Option.get evecs, evals
   | Complex32 ->
-    let d, z =
+    let evecs, evals =
       Eigs.csolve
         ~evecs:true
         ~tol
@@ -89,9 +83,9 @@ let eigs
         float
         Complex32
     in
-    d, Option.get z
+    Option.get evecs, evals
   | Complex64 ->
-    let d, z =
+    let evecs, evals =
       Eigs.csolve
         ~evecs:true
         ~tol
@@ -105,7 +99,7 @@ let eigs
         double
         Complex64
     in
-    d, Option.get z
+    Option.get evecs, evals
   | _         -> failwith "eigs: only implemented for float32(64) and complex32(64)"
 
 
@@ -123,9 +117,9 @@ let eigsvals
   =
   match kind with
   | Float32   ->
-    Eigs.rsolve ~evecs:false ~tol ?max_iter ?ncv ~which ~n ~nev av float Float32 |> fst
+    Eigs.rsolve ~evecs:false ~tol ?max_iter ?ncv ~which ~n ~nev av float Float32 |> snd
   | Float64   ->
-    Eigs.rsolve ~evecs:false ~tol ?max_iter ?ncv ~which ~n ~nev av double Float64 |> fst
+    Eigs.rsolve ~evecs:false ~tol ?max_iter ?ncv ~which ~n ~nev av double Float64 |> snd
   | Complex32 ->
     Eigs.csolve
       ~evecs:false
@@ -139,7 +133,7 @@ let eigsvals
       complex32
       float
       Complex32
-    |> fst
+    |> snd
   | Complex64 ->
     Eigs.csolve
       ~evecs:false
@@ -153,5 +147,5 @@ let eigsvals
       complex64
       double
       Complex64
-    |> fst
+    |> snd
   | _         -> failwith "eigs: only implemented for float32(64) and complex32(64)"
