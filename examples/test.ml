@@ -11,7 +11,7 @@ let av x y =
   Bigarray.Array1.blit Bigarray.(array1_of_genarray tmp) y
 
 
-let d, z = Arpack.D.eigs ~tol:0. ~which:`LM ~n ~nev av
+let z, d = Arpack.D.eigs ~tol:0. ~which:`LM ~n ~nev av
 
 let () =
   Mat.print d;

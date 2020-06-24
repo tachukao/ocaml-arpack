@@ -36,7 +36,7 @@ let solve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ kind =
   Ctypes.CArray.set iparam 6 1;
   let ipntr = Ctypes.CArray.(make int 11) in
   let resid = Ctypes.CArray.(make elt_typ n) in
-  let v = Bigarray.Genarray.create kind c_layout [| n; ncv |] in
+  let v = Bigarray.Genarray.create kind c_layout [| ncv; n |] in
   let workd = Bigarray.Array1.create kind c_layout (3 * n) in
   let ido = Ctypes.(allocate int 0) in
   let lworkl = (ncv * ncv) + (8 * ncv) in
@@ -75,11 +75,6 @@ let solve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ kind =
     let howmny = "A" in
     let select = Ctypes.CArray.(make int ncv) in
     let d = Bigarray.Genarray.create kind c_layout [| 1; nev |] in
-    let z =
-      if evecs
-      then Bigarray.Genarray.create kind c_layout [| n; nev |]
-      else Bigarray.Genarray.create kind c_layout [| 1 |]
-    in
     let resid = Ctypes.CArray.(make elt_typ n) in
     let ldz = n in
     let sigma = 0. in
@@ -89,7 +84,7 @@ let solve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ kind =
       ~howmny
       ~select:(Ctypes.CArray.start select)
       ~d:(Ctypes.bigarray_start genarray d)
-      ~z:(Ctypes.bigarray_start genarray z)
+      ~z:(Ctypes.bigarray_start genarray v)
       ~ldz
       ~sigma
       ~bmat
@@ -109,4 +104,4 @@ let solve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ kind =
       ~info;
     if Ctypes.(!@info) < 0
     then failwith (Printf.sprintf "*seupd_c error %i" Ctypes.(!@info));
-    if evecs then Some z, d else None, d)
+    if evecs then Some Genarray.(sub_left v 0 nev), d else None, d)
