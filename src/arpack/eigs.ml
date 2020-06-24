@@ -72,7 +72,8 @@ let rsolve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ kind =
     let rvec = if evecs then 1 else 0 in
     let howmny = "A" in
     let select = Ctypes.CArray.(make int ncv) in
-    let d = Bigarray.Genarray.create kind c_layout [| 2; nev |] in
+    (* real arrays need to provide an extra column for the complex-conjugate pairs*)
+    let d = Bigarray.Genarray.create kind c_layout [| 2; nev + 1 |] in
     let dr = Bigarray.Genarray.sub_left d 0 1 in
     let di = Bigarray.Genarray.sub_left d 1 1 in
     let resid = Ctypes.CArray.(make elt_typ n) in
@@ -80,6 +81,10 @@ let rsolve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ kind =
     let sigmar = 0. in
     let sigmai = 0. in
     let workev = Ctypes.CArray.(make elt_typ (3 * ncv)) in
+    let z =
+      (* real arrays need to provide an extra column for the complex-conjugate pairs*)
+      if evecs then Bigarray.Genarray.create kind c_layout [| nev + 1; n |] else v
+    in
     real_neupd
       ~kind
       ~rvec
@@ -87,7 +92,7 @@ let rsolve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ kind =
       ~select:(Ctypes.CArray.start select)
       ~dr:(Ctypes.bigarray_start genarray dr)
       ~di:(Ctypes.bigarray_start genarray di)
-      ~z:(Ctypes.bigarray_start genarray v)
+      ~z:(Ctypes.bigarray_start genarray z)
       ~ldz
       ~sigmar
       ~sigmai
@@ -109,7 +114,7 @@ let rsolve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ kind =
       ~info;
     if Ctypes.(!@info) < 0
     then failwith (Printf.sprintf "*neupd_c error %i" Ctypes.(!@info));
-    if evecs then Some Genarray.(sub_left v 0 nev), d else None, d)
+    if evecs then Some z, d else None, d)
 
 
 let csolve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ real_elt_typ kind =
@@ -130,7 +135,7 @@ let csolve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ real_elt_
   Ctypes.CArray.set iparam 6 1;
   let ipntr = Ctypes.CArray.(make int 11) in
   let resid = Ctypes.CArray.(make elt_typ n) in
-  let v = Bigarray.Genarray.create kind c_layout [| ncv + 1; n |] in
+  let v = Bigarray.Genarray.create kind c_layout [| ncv; n |] in
   let workd = Bigarray.Array1.create kind c_layout (3 * n) in
   let ido = Ctypes.(allocate int 0) in
   let lworkl = (3 * (ncv * ncv)) + (6 * ncv) in
@@ -170,7 +175,7 @@ let csolve ~evecs ?(tol = 0.) ?max_iter ?ncv ~which ~n ~nev av elt_typ real_elt_
     let rvec = if evecs then 1 else 0 in
     let howmny = "A" in
     let select = Ctypes.CArray.(make int ncv) in
-    let d = Bigarray.Genarray.create kind c_layout [| nev + 1; n |] in
+    let d = Bigarray.Genarray.create kind c_layout [| 1; nev |] in
     let resid = Ctypes.CArray.(make elt_typ n) in
     let ldz = n in
     let sigma = Complex.{ re = 0.; im = 0. } in
