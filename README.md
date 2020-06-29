@@ -1,7 +1,7 @@
 # OCaml Bindings to ARPACK-NG
 
-This is a light-weight OCaml wrapper to [ARPACK-NG](https://github.com/opencollab/arpack-ng).
-
+This is a light-weight OCaml wrapper to [ARPACK-NG](https://github.com/opencollab/arpack-ng). 
+Please see also [Owl ARPACK](https://github.com/tachukao/owl-arpack).
 
 ## Dependencies
 
